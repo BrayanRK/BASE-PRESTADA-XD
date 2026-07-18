@@ -1,0 +1,73 @@
+import type * as types from "../../../types/types.js"
+import * as database from "../../../database/database.js"
+import { getScopedGroupJid } from "../../../libs/bot-scope.js"
+
+const groupCard = (title: string, lines: string[] = []): string =>
+  [`「☄」 ${title}`, ...lines.map((line) => `│ ${line}`)].join("\n")
+
+const parseState = (value?: string): boolean | null => {
+  const text = String(value || "").toLowerCase().trim()
+  if (["on", "true", "1", "si", "sí", "activar", "enable"].includes(text)) return true
+  if (["off", "false", "0", "no", "desactivar", "disable"].includes(text)) return false
+  return null
+}
+
+export default {
+  name: "antispam",
+  alias: ["spam", "spamguard"],
+  description: "Activa o desactiva el anti spam del grupo.",
+  using: "<on|off>",
+  category: "group",
+  hidden: false,
+  flags: ["only.groups"],
+  requires: ["administrator.user"],
+  execute: async (_wss, { mctx, args, group, commandName, usedPrefix, bot }) => {
+    const current = Boolean(group.antispam_enabled)
+
+    if (!args.length) {
+      await mctx.reply(
+        groupCard("Anti Spam", [
+            `Grupo › ${mctx.chat.name.trim()}`,
+            `Estado › ${current ? "activado" : "desactivado"}`,
+            "Función › detecta spam de stickers y mensajes repetidos",
+          `Uso › ${usedPrefix + commandName} ${current ? "off" : "on"}`,
+        ]),
+      )
+      return
+    }
+
+    if (parseState(args[0]) === null) {
+      await mctx.reply(
+        groupCard("Formato inválido.", [
+          "Permitido › on / off",
+          `Uso › ${usedPrefix + commandName} on`,
+        ]),
+      )
+      return
+    }
+
+    const shouldEnable = parseState(args[0])
+    if (current === shouldEnable) {
+      await mctx.reply(
+        groupCard("Sin cambios.", [
+          "Función › anti spam",
+          `Estado › ya estaba ${shouldEnable ? "activado" : "desactivado"}`,
+        ]),
+      )
+      return
+    }
+
+    await database.Groups.update(getScopedGroupJid(bot, mctx.chat.jid), {
+      $set: {
+        antispam_enabled: shouldEnable,
+      },
+    })
+
+    await mctx.reply(
+      groupCard("Ajuste actualizado.", [
+        "Función › anti spam",
+        `Estado › ${shouldEnable ? "activado" : "desactivado"}`,
+      ]),
+    )
+  },
+} as types.Command

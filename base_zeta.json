@@ -1,0 +1,26 @@
+{
+  "botName": "BrayanRK-ADMIN",
+  "ownerJid": "573223090406@s.whatsapp.net",
+  "ownerLid": "",
+  "ownerPn": "573223090406@s.whatsapp.net",
+  "ownerNumber": "573223090406",
+  "currencyName": "Bitcoin",
+  "ownerName": "BrayanRK",
+  "receptionNumber": "",
+  "channelUrl": "",
+  "socialLinks": {
+    "facebook": "",
+    "instagram": "",
+    "tiktok": "",
+    "telegram": ""
+  },
+  "setup": {
+    "completed": false,
+    "lockedChatJid": "",
+    "assets": {},
+    "textCompleted": {},
+    "prefixes": [],
+    "updatedAt": ""
+  },
+  "configuredAt": "2026-07-17T04:44:21.018Z"
+}
